@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import "tailwindcss/tailwind.css";
 import ClientProvider from "@/HOC/ClientProvider";
 
 const font = Roboto({
