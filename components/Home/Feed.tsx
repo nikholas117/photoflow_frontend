@@ -5,12 +5,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { handleAuthRequest } from "../utils/apiRequest";
-import {
-  addComment,
-  deletePost,
-  likeOrDislike,
-  setPost,
-} from "@/store/postSlice";
+import { addComment, likeOrDislike, setPost } from "@/store/postSlice";
 import { Bookmark, HeartIcon, Loader, MessageCircle, Send } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import DotButton from "../Helper/DotButton";
