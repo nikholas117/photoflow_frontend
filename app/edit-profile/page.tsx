@@ -1,7 +1,11 @@
 "use client";
-import PasswordInput from "@/components/Auth/PasswordInput";
-import LoadingButton from "@/components/Helper/LoadingButton";
-import LeftSidebar from "@/components/Home/LeftSidebar";
+
+import React, { useRef, useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "sonner";
+import axios from "axios";
+
+import { MenuIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Sheet,
@@ -10,15 +14,15 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+
+import PasswordInput from "@/components/Auth/PasswordInput";
+import LoadingButton from "@/components/Helper/LoadingButton";
+import LeftSidebar from "@/components/Home/LeftSidebar";
+
 import { handleAuthRequest } from "@/components/utils/apiRequest";
 import { BASE_API_URL } from "@/server";
 import { setAuthUser } from "@/store/authSlice";
 import { RootState } from "@/store/store";
-import axios from "axios";
-import { MenuIcon } from "lucide-react";
-import React, { useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { toast } from "sonner";
 
 const EditProfile = () => {
   const dispatch = useDispatch();
@@ -32,6 +36,24 @@ const EditProfile = () => {
   const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  // ✅ Fetch user data on mount (optional)
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get(`${BASE_API_URL}/users/me`, {
+          withCredentials: true,
+        });
+        dispatch(setAuthUser(res.data.data.user));
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    };
+
+    if (!user) {
+      fetchUser();
+    }
+  }, [dispatch, user]);
 
   const handleAvatarClick = () => {
     if (fileInputRef.current) fileInputRef.current.click();
@@ -51,7 +73,7 @@ const EditProfile = () => {
     formData.append("bio", bio);
 
     if (fileInputRef.current?.files?.[0]) {
-      formData.append("profilePicture", fileInputRef.current?.files?.[0]);
+      formData.append("profilePicture", fileInputRef.current.files[0]);
     }
 
     const updateProfileReq = async () =>
@@ -69,6 +91,7 @@ const EditProfile = () => {
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
+
     const data = {
       currentPassword,
       newPassword,
@@ -135,6 +158,7 @@ const EditProfile = () => {
               </LoadingButton>
             </div>
           </div>
+
           <div className="mt-10 border-b-2 pb-10">
             <label htmlFor="bio" className="block text-lg font-bold mb-2">
               Bio
@@ -153,6 +177,7 @@ const EditProfile = () => {
               Change Bio
             </LoadingButton>
           </div>
+
           <div>
             <h1 className="text-2xl font-bold text-gray-900 mt-6">
               Change Password
@@ -166,7 +191,7 @@ const EditProfile = () => {
                   onChange={(e) => setCurrentPassword(e.target.value)}
                 />
               </div>
-              <div className="w-[90%] md:w-[80%] lg:w-[60%]  mt-4 mb-4">
+              <div className="w-[90%] md:w-[80%] lg:w-[60%] mt-4 mb-4">
                 <PasswordInput
                   name="newpassword"
                   value={newPassword}
